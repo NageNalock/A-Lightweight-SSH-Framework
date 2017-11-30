@@ -11,11 +11,6 @@ import java.io.OutputStream;
 public class SimpleController extends HttpServlet {
 
     @Override
-    public void init() throws ServletException {
-        OutputStream out = 
-    }
-
-    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         doPost(req,resp);
     }

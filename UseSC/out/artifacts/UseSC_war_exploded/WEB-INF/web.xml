@@ -15,6 +15,6 @@
     </servlet-mapping>
 
     <welcome-file-list>
-        <welcome-file>HelloJ2EE.html</welcome-file>
+        <welcome-file>welcome.html</welcome-file>
     </welcome-file-list>
 </web-app>
