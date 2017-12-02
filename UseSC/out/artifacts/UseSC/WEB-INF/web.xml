@@ -11,7 +11,7 @@
 
     <servlet-mapping>
         <servlet-name>sc</servlet-name>
-        <url-pattern>/UseSC</url-pattern>
+        <url-pattern>/sc</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
