@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modules id="123">
+    <module>
+        <name>oa</name>
+        <value>系统基本配置</value>
+        <descript>对系统的基本配置根目录</descript>
+    </module>
+</modules>

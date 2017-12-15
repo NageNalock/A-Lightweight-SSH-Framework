@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/UseSc.iml" filepath="$PROJECT_DIR$/UseSc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DOM4JTest.iml" filepath="$PROJECT_DIR$/DOM4JTest.iml" />
     </modules>
   </component>
 </project>
