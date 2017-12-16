@@ -30,6 +30,7 @@ public class LogInterceptor {
         // 此时的时间为访问开始时间
         name = input_name;
         s_time = input_time;
+        System.out.println("拦截器preAction执行完毕");
     }
 
     public void afterAction(String input_result,String input_time)
@@ -40,6 +41,7 @@ public class LogInterceptor {
         result = input_result;
         e_time = input_time;
         writeLog();
+        System.out.println("拦截器afterAction执行完毕");
     }
 
     private void writeLog()
@@ -53,6 +55,13 @@ public class LogInterceptor {
 //            </action>
 //        </log>
         // 不用加属性
+        System.out.println("在写入log前检查四个属性");
+        System.out.println("name"+name);
+        System.out.println("进入时间"+s_time);
+        System.out.println("退出时间"+e_time);
+        System.out.println("返回结果"+result);
+
+        System.out.println("开始写入Log文件");
         try {
 
             Document document = DocumentHelper.createDocument();
