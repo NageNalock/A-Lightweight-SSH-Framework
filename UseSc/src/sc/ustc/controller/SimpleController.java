@@ -1,6 +1,7 @@
 package sc.ustc.controller;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import water.ustc.interceptor.InterceptorAttribute;
@@ -10,8 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -242,6 +242,17 @@ public class SimpleController extends HttpServlet {
                     String resultType = result.attributeValue("type");
                     System.out.println("有找到Result!!!!!!!xml中result的type为:"+resultType);
                     String resultValue = result.attributeValue("value");
+                    // 判断一波resultvalue的值
+                    if (resultValue.contains("_view.xml"))
+                    {
+                        System.out.println("        result调用文件是视图文件:");
+                        System.out.println("            视图文件xml文件名是:"+resultValue+",,,,,,读取xml文件");
+
+                        // 生成html文件
+                        resultValue = doResultView(resultValue)+".html";
+
+                        System.out.println("视图HTML:"+resultValue);
+                    }else System.out.println("          result调用文件是普通文件");
                     System.out.println("其value为:"+resultValue);
                     if (resultType.equals("forward"))
                     {
@@ -270,5 +281,118 @@ public class SimpleController extends HttpServlet {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String doResultView(String resultValue)
+    {
+        String newResultValue = resultValue.split("_")[0];
+        System.out.println(newResultValue);
+        try {
+            System.out.println("*********************ViewXML************************");
+
+            // 创建HTML文件与Builder
+            StringBuilder sb = new StringBuilder();
+            PrintStream printStream = null ;
+            try {
+                printStream= new PrintStream(new FileOutputStream("F:\\J2EE\\UseSc\\web\\"+newResultValue+".html"));//路径默认在项目根目录下
+                // F:\J2EE\UseSc\web\failure.jsp
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            InputStream inputStream = this.getClass().getResourceAsStream(resultValue);
+            SAXReader saxReader = new SAXReader();
+            Document document = saxReader.read(inputStream);
+
+            // 获得(0)根节点,<view>
+            Element rootElement = document.getRootElement();
+            System.out.println("根节点名称:"+rootElement.getName()+",其内容为:"+rootElement.getTextTrim());
+
+            /* HTML标题部分,无列表 */
+            // 获得(1)层节点,<header>
+            Element header = rootElement.element("header");
+            System.out.println("    标题部分(1)层节点名称为"+header.getName());
+            // System.out.println("    其属性个数为:"+header.attributeCount());
+            // 获得(2)层节点,<title>
+            Element title = header.element("title");
+            String titleTextTrim = title.getTextTrim();
+            System.out.println("        标题部分(2)层节点名称为"+title.getName());
+            System.out.println("        其文本内容为"+titleTextTrim); // 标题实际内容
+            // 这里可以输出HTML的标题部分
+            sb.append("<!DOCTYPE html>\n");
+            sb.append("<html lang=\"en\">\n");
+            sb.append("<head>\n");
+            sb.append("    <meta charset=\"UTF-8\">\n");
+            sb.append("<title>"+titleTextTrim+"</title>\n");
+            sb.append("</head>\n");
+            sb.append("<body>\n");
+
+            /* HTML内容部分,其子节点会有列表 */
+            // 获得(1)层节点,<body>
+            Element body = rootElement.element("body");
+            System.out.println("    内容部分(1)层节点名称为"+body.getName()); // 这层不需要列表
+            List<Element> bodyChildElementsList = body.elements(); // HTML页面内容有多种可能
+            for (Element bodyChild:bodyChildElementsList)
+            {
+                switch (bodyChild.getName())
+                {
+                    case "form":
+                    {
+                        // 获得(2)层节点,<form>
+                        Element form = body.element("form");
+                        System.out.println("        内容部分(2)层节点名称为"+form.getName()); // 这层也无列表,但是下一层有
+                        // 获得(3)层节点,完全遍历
+                        List<Element> formAttributesAndViewsList = form.elements();
+
+                        // <form name="logoutForm" action="logout.action" method="post">
+                        String formName = form.element("name").getTextTrim();
+                        String formAction = form.element("action").getTextTrim();
+                        String formMethod = form.element("method").getTextTrim();
+                        // System.out.println("<form name=\""+formName+"\" action=\""+formAction+"\" method=\""+formMethod+"\">");
+                        sb.append("<form name=\""+formName+"\" action=\""+formAction+"\" method=\""+formMethod+"\">\n");
+
+                        for(Element formAV:formAttributesAndViewsList)
+                        {
+                            // 这里可以输出
+                            System.out.println("            内容部分(3)层节点名称"+formAV.getName());
+                            switch (formAV.getName())
+                            {
+                                case "textView":
+                                {
+                                    String avValue = formAV.element("value").getTextTrim();
+                                    String avName = formAV.element("name").getTextTrim();
+                                    String avLabel = formAV.element("label").getTextTrim();
+                                    // System.out.println(avValue);
+                                    sb.append("  <input type=\"text\" name=\""+avName+"\" value=\""+avValue+"\" aria-label=\""+avLabel+"\">\n");
+                                    System.out.println("写入内容为:");
+                                    System.out.println("  <input type=\"text\" name=\""+avName+" value="+avValue+" aria-label="+avLabel+"\">\n");
+                                    break;
+                                }
+                                case "buttonView":
+                                {
+                                    String avName = formAV.element("name").getTextTrim();
+                                    String avLabel = formAV.element("label").getTextTrim();
+                                    sb.append("  <input type=\"button\" name=\""+avName+"\" aria-label=\""+avLabel+"\">\n") ;
+                                    System.out.println("写入内容为:");
+                                    System.out.println("  <input type=\"button\" name=\""+avName+"\" aria-label=\""+avLabel+"\">\n");
+                                    break;
+                                }
+                            }
+
+                        }
+                        sb.append("</form>\n");
+                        break;
+                    }
+                }
+            }
+
+            sb.append("</body>\n");
+            sb.append("</html>\n");
+            printStream.println(sb.toString());
+            System.out.println("*********************ViewXML************************");
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        return newResultValue;
     }
 }

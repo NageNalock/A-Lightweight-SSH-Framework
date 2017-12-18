@@ -4,9 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
     version="2.0">
+    <interceptor name="log" class="water.ustc.interceptor.LogInterceptor" predo="preAction" afterdo="afterAction"></interceptor>
     <controller>
         <action name="loginAction.sc" class="water.ustc.action.LoginAction" method="handleLogin">
-            <result name="success" type="forward" value="/welcome.jsp"></result>
+            <interceptro-ref name="log"></interceptro-ref>
+            <result name="success" type="forward" value="/success_view.xml"></result>
             <result name="failure" type="redirect" value="/failure.jsp"></result>
         </action>
         <action name="registerAction.sc" class="water.ustc.action.RegisterAction" method="handleRegister">

@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="dom4j-2.0.2">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../JavaPackag/dom4j-2.0.2.jar!/" />
+      <root url="jar://F:/JavaPackag/dom4j-2.0.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

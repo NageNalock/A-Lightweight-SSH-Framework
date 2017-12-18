@@ -8,7 +8,7 @@
     <controller>
         <action name="loginAction.sc" class="water.ustc.action.LoginAction" method="handleLogin">
             <interceptro-ref name="log"></interceptro-ref>
-            <result name="success" type="forward" value="/welcome.jsp"></result>
+            <result name="success" type="forward" value="/success_view.xml"></result>
             <result name="failure" type="redirect" value="/failure.jsp"></result>
         </action>
         <action name="registerAction.sc" class="water.ustc.action.RegisterAction" method="handleRegister">
