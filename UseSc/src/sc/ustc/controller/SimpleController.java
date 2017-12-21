@@ -7,7 +7,6 @@ import org.dom4j.io.SAXReader;
 import water.ustc.interceptor.InterceptorAttribute;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -242,6 +241,7 @@ public class SimpleController extends HttpServlet {
                     String resultType = result.attributeValue("type");
                     System.out.println("有找到Result!!!!!!!xml中result的type为:"+resultType);
                     String resultValue = result.attributeValue("value");
+
                     // 判断一波resultvalue的值
                     if (resultValue.contains("_view.xml"))
                     {
@@ -285,12 +285,16 @@ public class SimpleController extends HttpServlet {
 
     private String doResultView(String resultValue)
     {
-        String newResultValue = resultValue.split("_")[0];
+        /*
+        *  输入 原result *_view.xml
+        *  返回 结果关键字
+        * */
+        String newResultValue = resultValue.split("_")[0]; // 提取关键字,这里是"success"
         System.out.println(newResultValue);
         try {
             System.out.println("*********************ViewXML************************");
 
-            // 创建HTML文件与Builder
+            // 创建HTML文件与StringBuilder
             StringBuilder sb = new StringBuilder();
             PrintStream printStream = null ;
             try {
@@ -300,7 +304,7 @@ public class SimpleController extends HttpServlet {
                 e.printStackTrace();
             }
 
-            InputStream inputStream = this.getClass().getResourceAsStream(resultValue);
+            InputStream inputStream = this.getClass().getResourceAsStream(resultValue); // 找到对应xml文件
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(inputStream);
 
@@ -342,7 +346,7 @@ public class SimpleController extends HttpServlet {
                         Element form = body.element("form");
                         System.out.println("        内容部分(2)层节点名称为"+form.getName()); // 这层也无列表,但是下一层有
                         // 获得(3)层节点,完全遍历
-                        List<Element> formAttributesAndViewsList = form.elements();
+                        List<Element> formAttributesAndViewsList = form.elements(); // 获得表单的属性
 
                         // <form name="logoutForm" action="logout.action" method="post">
                         String formName = form.element("name").getTextTrim();
