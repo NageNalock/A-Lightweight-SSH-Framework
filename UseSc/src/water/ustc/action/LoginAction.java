@@ -1,5 +1,7 @@
 package water.ustc.action;
 
+import water.ustc.bean.UserBean;
+
 /**
  * \* Created with IntelliJ IDEA.
  * \* User: hasee
@@ -15,15 +17,25 @@ public class LoginAction {
 //        //去数据库中查找匹配
 //        User user = db.checkUser(name,pwd);
         //	Login中根据传入的name与pwd进行判断,跳转,判断成功则返回success,失败则返回failure
-        if (name.equals("tom") && pwd.equals("123")) {
-            System.out.println("*****************************************");
-            System.out.println("LoginAciton结果是success");
-            System.out.println("******************************************");
+//        if (name.equals("tom") && pwd.equals("123")) {
+//            System.out.println("*****************************************");
+//            System.out.println("LoginAciton结果是success");
+//            System.out.println("******************************************");
+//            return "success";
+//        } else {
+//            System.out.println("*****************************************");
+//            System.out.println("LoginAciton结果是failure");
+//            System.out.println("******************************************");
+//            return "failure";
+//        }
+        String id = "111"; // ID写死
+        UserBean userBean = new UserBean(id, name, pwd);
+        userBean.setUrl("jdbc:mysql://127.0.0.1:3306/USTC");
+        userBean.setDriver("com.mysql.jdbc.Driver");
+        if(userBean.signIn())
+        {
             return "success";
-        } else {
-            System.out.println("*****************************************");
-            System.out.println("LoginAciton结果是failure");
-            System.out.println("******************************************");
+        }else {
             return "failure";
         }
     }

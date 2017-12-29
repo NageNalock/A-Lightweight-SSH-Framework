@@ -1,5 +1,7 @@
 package water.ustc.action;
 
+import water.ustc.bean.UserBean;
+
 public class RegisterAction {
 
     public String handleRegister(String userName, String pwd) {
@@ -8,6 +10,17 @@ public class RegisterAction {
 //        DB db = new DB();
 //        db.insertUserInfo(userName,pwd);
 //        System.out.println("用户名"+userName+"密码"+pwd);
-        return "success";
+        String id = "111"; // ID写死
+        UserBean userBean = new UserBean(id, userName, pwd);
+        userBean.setUrl("jdbc:mysql://127.0.0.1:3306/USTC");
+        userBean.setDriver("com.mysql.jdbc.Driver");
+
+        if (userBean.signUp())
+        {
+            return "success";
+        }
+        else {
+            return "handleRegister()出错";
+        }
     }
 }
