@@ -3,8 +3,10 @@ package sc.ustc.dao;
 import java.sql.*;
 
 public abstract class BaseDAO {
-    protected String userName; // ?为什么要写成protected类??
-    protected String userPassword;
+
+
+    protected String db_userName; // 数据库的用户和密码,别与实体类搞混了
+    protected String db_userPassword;
     protected String driver; // 驱动
     protected String url; // 数据库地址
 
@@ -28,7 +30,7 @@ public abstract class BaseDAO {
             {
                 try {
                     // System.out.println("000000"+url+";"+userName+";"+userPassword+"000000");
-                    conn = DriverManager.getConnection(url,"USTC","123");
+                    conn = DriverManager.getConnection(url,db_userName,db_userPassword);
                 } catch (SQLException e) {
                     System.out.println("    创建链接失败:"+e);
                     // e.printStackTrace();
@@ -78,20 +80,20 @@ public abstract class BaseDAO {
 
 
 
-    public String getUserName() {
-        return userName;
+    public String getDb_userName() {
+        return db_userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setDb_userName(String db_userName) {
+        this.db_userName = db_userName;
     }
 
-    public String getUserPassword() {
-        return userPassword;
+    public String getDb_userPassword() {
+        return db_userPassword;
     }
 
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
+    public void setDb_userPassword(String db_userPassword) {
+        this.db_userPassword = db_userPassword;
     }
 
     public String getDriver() {

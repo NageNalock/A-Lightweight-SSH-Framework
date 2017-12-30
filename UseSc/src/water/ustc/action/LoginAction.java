@@ -28,10 +28,12 @@ public class LoginAction {
 //            System.out.println("******************************************");
 //            return "failure";
 //        }
-        String id = "111"; // ID写死
+        String id = "112"; // ID写死
         UserBean userBean = new UserBean(id, name, pwd);
         userBean.setUrl("jdbc:mysql://127.0.0.1:3306/USTC");
         userBean.setDriver("com.mysql.jdbc.Driver");
+        userBean.setDb_userName("USTC");
+        userBean.setDb_userPass("123");
         if(userBean.signIn())
         {
             return "success";

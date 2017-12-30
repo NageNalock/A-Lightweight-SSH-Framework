@@ -3,21 +3,28 @@ package water.ustc.dao;
 import sc.ustc.dao.BaseDAO;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UserDAO extends BaseDAO {
+
     /**
      * connection pstmt rs
      * **/
-    public UserDAO(String un, String pwd, String url, String driver)
+    public UserDAO(String dbun, String dbpwd, String url, String driver)
     {
         // 在构造方法中初始化父类域(利用Setter方法)
-        this.setUserName(un);
-        this.setUserPassword(pwd);
+        // this.setUserName(un);
+        // this.setUserPassword(pwd);
+        this.setDb_userName(dbun);
+        this.setDb_userPassword(dbpwd);
         this.setUrl(url);
         this.setDriver(driver);
     }
 
+    // 用户的账号和密码
+    private String userName;
+    private String userPassword;
 
     // 重写query
     @Override
@@ -27,8 +34,7 @@ public class UserDAO extends BaseDAO {
         // 打开连接
         Connection connection = this.openDBConnection();
         // 返回结果
-        // Object queryResult = null;
-        HashMap<String, String> queryResult = new HashMap<>();
+        ArrayList<HashMap<String,String>> resultHashMapList = new ArrayList<HashMap<String,String>>();
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql); // 预编译
@@ -40,6 +46,9 @@ public class UserDAO extends BaseDAO {
 
             while (resultSet.next())
             {
+                // 获取表单中所有结果
+                HashMap<String, String> queryResult = new HashMap<>();
+
                 String result1 = resultSet.getString("USERNAME");
                 String result2 = resultSet.getString("USERPASS");
                 String result3 = resultSet.getString("USERID");
@@ -47,6 +56,8 @@ public class UserDAO extends BaseDAO {
                 queryResult.put("username",result1);
                 queryResult.put("userpass",result2);
                 queryResult.put("userID",result3);
+
+                resultHashMapList.add(queryResult);
             }
 
             // 关闭连接
@@ -56,7 +67,7 @@ public class UserDAO extends BaseDAO {
             System.out.println("    query()方法出错:" + e);
         }
 
-        return queryResult;
+        return resultHashMapList;
     }
 
     @Override
@@ -141,5 +152,15 @@ public class UserDAO extends BaseDAO {
             System.out.println("创建表格失败"+e);
         }
 
+    }
+
+    public  String getUserName() {
+        return userName;
+    }public void   setUserName(String userName) {
+        this.userName = userName;
+    }public String getUserPassword() {
+        return userPassword;
+    }public void   setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
 }

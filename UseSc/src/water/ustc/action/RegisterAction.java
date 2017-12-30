@@ -10,11 +10,12 @@ public class RegisterAction {
 //        DB db = new DB();
 //        db.insertUserInfo(userName,pwd);
 //        System.out.println("用户名"+userName+"密码"+pwd);
-        String id = "111"; // ID写死
+        String id = "112"; // ID写死
         UserBean userBean = new UserBean(id, userName, pwd);
         userBean.setUrl("jdbc:mysql://127.0.0.1:3306/USTC");
         userBean.setDriver("com.mysql.jdbc.Driver");
-
+        userBean.setDb_userName("USTC");
+        userBean.setDb_userPass("123");
         if (userBean.signUp())
         {
             return "success";
