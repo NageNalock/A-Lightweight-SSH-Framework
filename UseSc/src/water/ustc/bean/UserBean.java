@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UserBean {
-    private String userID; // 觉得需求有问题,改了下逻辑
+    private String userID;
     private String userName;
     private String userPass;
 
@@ -54,11 +54,6 @@ public class UserBean {
                     System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
                     return true;
                 }
-//                else {
-//                    System.out.println("            ID匹配失败~页面ID为:"+userID+";query返回ID为:"+queryUserID+"signIn失败");
-//                    System.out.println("            ID匹配失败~页面pass为:"+userPass+";query返回pass为:"+queryUserPass+"signIn失败");
-//                    System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-//                    return false;
             }
 
             System.out.println("            ID匹配失败~页面ID为:"+userID+";query返回ID为:");
