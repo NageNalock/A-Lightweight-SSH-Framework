@@ -1,124 +1,73 @@
 package water.ustc.bean;
 
-import water.ustc.dao.UserDAO;
+import sc.ustc.dao.Conversation;
+import sc.ustc.dao.QueryResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserBean {
-    private String userID;
+public class UserBean  {
+
     private String userName;
     private String userPass;
 
-    private String url; // 需要在Action中单独设置
-    private String driver; // 需要Action中单独设置
-    private String db_userName; // 同上
-    private String db_userPass;
-
-
-
-    public UserBean(String uID, String name, String pass)
+    public UserBean(String userName,String userPass)
     {
-        this.userID = uID;
-        this.userName = name;
-        this.userPass = pass;
+        this.userName = userName;
+        this.userPass = userPass;
     }
 
     public boolean signIn()
     {
-        UserDAO userDAO = new UserDAO(db_userName, db_userPass, url, driver);
-        userDAO.setUserName(userName);
-        userDAO.setUserPassword(userPass);
-        String sql = "SELECT *   FROM USER   WHERE  USERNAME=? and USERPASS=? and USERID="+userID;
-        System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-        System.out.println("执行signIn()");
-        // 判断userDAO的query方法,并取出ID与PASS,考虑到可能会有重名的情况,同时要匹配ID
-        // HashMap queryResult = (HashMap) userDAO.query(sql);
-        ArrayList queryResultList = (ArrayList) userDAO.query(sql);
-        if (queryResultList == null)
+        Conversation conversation = new Conversation(this.getClass().getName());
+        String userPassFromDB = null; // 查询出的密码
+        // 1.执行查询
+        QueryResult queryResult = conversation.query(this, "userName");
+        // 2.验证结果是否为懒加载
+        if (queryResult.isLazy())
         {
-            System.out.println("    signIn()中query()的返回值为空,signIn失败");
-            System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-            return false;
-        }else {
-            // 遍历List
-            for (Object queryresult:queryResultList) {
-                HashMap queryresult_hm = (HashMap) queryresult;
-                // 取出userID和PASS
-                String queryUserID = (String) queryresult_hm.get("userID");
-                String queryUserPass = (String) queryresult_hm.get("userpass");
-
-                if (userID.equals(queryUserID) && userPass.equals(queryUserPass))
-                {
-                    System.out.println("            ID匹配成功,signIn成功");
-                    System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-                    return true;
-                }
+            // 是懒加载
+            System.out.println("signIn得到的查询结果是懒加载");
+            // 2.1 执行懒加载方法获得结果
+            ArrayList<HashMap<String, String>> hashMapsList = queryResult.notLazy();
+            for(HashMap<String,String> hashMap:hashMapsList)
+            {
+                userPassFromDB = hashMap.get("user_pass"); // 反正这个情况只会有一个值
+                System.out.println("数据库中读出的密码为:"+userPassFromDB);
             }
-
-            System.out.println("            ID匹配失败~页面ID为:"+userID+";query返回ID为:");
-            System.out.println("            ID匹配失败~页面pass为:"+userPass);
-            System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-            return false;
+        }else {
+            // 不是懒加载
+            System.out.println("signIn得到的查询结果不是懒加载");
+            // 2.1
+            ArrayList<HashMap<String, String>> resultList = queryResult.getResultList();
+            for(HashMap<String,String> hashMap:resultList)
+            {
+                userPassFromDB = hashMap.get("user_pass"); // 反正这个情况只会有一个值
+                System.out.println("数据库中读出的密码为:"+userPassFromDB);
+            }
         }
+        // 3.匹配密码
+        if (userPass.equals(userPassFromDB))
+            return true;  // 相等
+        else return false;
     }
 
     public boolean signUp()
     {
-        // 注册
-        // 具体逻辑:在UserDAO中完成插入
-        // 插入的内容为name,pass,id
-        System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-        System.out.println("执行signUp()");
-        String tableName = "USER";
-        String sql="INSERT INTO "+tableName+"(USERNAME,USERPASS,USERID)  VALUES(?,?,"+userID+")";
-        UserDAO userDAO = new UserDAO(db_userName, db_userPass, url, driver);
-        userDAO.setUserName(userName);
-        userDAO.setUserPassword(userPass);
-        if(userDAO.insert(sql,tableName))
-        {
-            System.out.println("    signUp()执行成功");
-            System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-            return true;
-        }
-        else {
-            System.out.println("   signUp()执行失败");
-            System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-            return false;
-        }
+        // 1. Conversation
+        Conversation conversation = new Conversation(this.getClass().getName());
+        // 2. 调用insert()
+        boolean insertResult = conversation.insert(this);
+        // 3. 得到结果()
+        return insertResult;
     }
 
 
-
-    public String getUrl() {
-        return url;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public String getDb_userName() {
-        return db_userName;
-    }
-
-    public void setDb_userName(String db_userName) {
-        this.db_userName = db_userName;
-    }
-
-    public String getDb_userPass() {
-        return db_userPass;
-    }
-
-    public void setDb_userPass(String db_userPass) {
-        this.db_userPass = db_userPass;
+    public String getUserPass() {
+        return userPass;
     }
 }

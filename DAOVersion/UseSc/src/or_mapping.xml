@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OR-Mappings>
+    <jbdc>
+        <!--配置部分-->
+        <property>
+            <name>driver_class</name>
+            <value>com.mysql.jdbc.Driver</value>
+        </property>
+        <property>
+            <name>url_path</name>
+            <value>jdbc:mysql://127.0.0.1:3306/USTC</value>
+        </property>
+        <property>
+            <name>db_uesername</name>
+            <value>USTC</value>
+        </property>
+        <property>
+            <name>db_userpassword</name>
+            <value>123</value>
+        </property>
+    </jbdc>
+    <class>
+        <!--映射文件-->
+
+        <!--JavaBean名称,-->
+        <name>UserBean</name>
+        <!--对应数据库中的表名-->
+        <table>user</table>
+        <id>
+            <!--主键属性名称-->
+            <name>userID</name>
+        </id>
+        <property>
+            <name>userName</name>
+            <column>user_name</column>
+            <type>String</type>
+            <!--是否使用延迟加载-->
+            <lazy>false</lazy>
+        </property>
+        <property>
+            <name>userPass</name>
+            <column>user_pass</column>
+            <type>String</type>
+            <lazy>true</lazy>
+        </property>
+    </class>
+</OR-Mappings>
