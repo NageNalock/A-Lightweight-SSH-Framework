@@ -32,7 +32,7 @@ public class UserBean  {
             ArrayList<HashMap<String, String>> hashMapsList = queryResult.notLazy();
             for(HashMap<String,String> hashMap:hashMapsList)
             {
-                userPassFromDB = hashMap.get("user_pass"); // 反正这个情况只会有一个值
+                userPassFromDB = hashMap.get("userPass"); // 反正这个情况只会有一个值
                 System.out.println("数据库中读出的密码为:"+userPassFromDB);
             }
         }else {
@@ -42,7 +42,7 @@ public class UserBean  {
             ArrayList<HashMap<String, String>> resultList = queryResult.getResultList();
             for(HashMap<String,String> hashMap:resultList)
             {
-                userPassFromDB = hashMap.get("user_pass"); // 反正这个情况只会有一个值
+                userPassFromDB = hashMap.get("userPass"); // 反正这个情况只会有一个值
                 System.out.println("数据库中读出的密码为:"+userPassFromDB);
             }
         }

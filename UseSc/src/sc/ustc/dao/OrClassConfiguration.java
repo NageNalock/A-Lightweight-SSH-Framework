@@ -3,7 +3,7 @@ package sc.ustc.dao;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class OrClassConfiguration {
+class OrClassConfiguration {
 
     private String name;
     private String table;
@@ -23,10 +23,10 @@ public class OrClassConfiguration {
         propertiesList.add(tempProperty);
     }
 
-    public ArrayList<HashMap> getPropertiesList() {
+    ArrayList<HashMap> getPropertiesList() {
         return propertiesList;
     }
-    public String getClassName() {
+    String getClassName() {
         return name;
     }
 
@@ -34,7 +34,7 @@ public class OrClassConfiguration {
         this.name = name;
     }
 
-    public String getTable() {
+    String getTable() {
         return table;
     }
 
@@ -42,7 +42,7 @@ public class OrClassConfiguration {
         this.table = table;
     }
 
-    public String getClassId() {
+    String getClassId() {
         return id;
     }
 

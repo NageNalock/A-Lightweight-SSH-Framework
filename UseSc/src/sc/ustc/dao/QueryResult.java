@@ -15,28 +15,30 @@ public class QueryResult {
 
     // 存放sql信息,在实际需要调用result时进行数据库查询,其实beanName好像也应该加进去
     private String sql;
-    private String driver_class;
-    private String url_path;
-    private String db_username;
-    private String db_userpassword;
+//    private String driver_class;
+//    private String url_path;
+//    private String db_username;
+//    private String db_userpassword;
 
     public QueryResult(boolean lazyFlag)
     {
         this.lazyFlag = lazyFlag;
     }
 
-    public void setLazySQL(String sql,String driver_class,String url_path,String db_username,String db_userpassword)
+    public void setLazySQL(String sql)
     {
+        // 设置懒加载相关的信息
         System.out.println("是懒加载,存放queryResult的SQL信息");
         this.sql = sql;
-        this.driver_class = driver_class;
-        this.url_path = url_path;
-        this.db_username = db_username;
-        this.db_userpassword = db_userpassword;
+//        this.driver_class = driver_class;
+//        this.url_path = url_path;
+//        this.db_username = db_username;
+//        this.db_userpassword = db_userpassword;
     }
 
     public ArrayList<HashMap<String,String>> notLazy()
     {
+        // 对懒加载的信息属性需要使用时该方法
         System.out.println("对懒加载结果开始查询数据库");
         // 实际需要获取结果了,查询数据库
 

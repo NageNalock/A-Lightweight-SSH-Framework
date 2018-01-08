@@ -25,7 +25,7 @@
         <!--JavaBean名称,-->
         <name>UserBean</name>
         <!--对应数据库中的表名-->
-        <table>user2</table>
+        <table>user3</table>
         <id>
             <!--主键属性名称-->
             <name>userID</name>

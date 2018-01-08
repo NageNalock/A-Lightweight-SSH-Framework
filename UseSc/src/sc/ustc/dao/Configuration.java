@@ -19,10 +19,10 @@ public class Configuration {
     private String db_userpassword;
 
 
-
+    // 保存class信息
     private ArrayList<OrClassConfiguration> classList = new ArrayList<>();
 
-    public Configuration()
+    Configuration()
     {
         this.readMapping();
     }

@@ -26,7 +26,7 @@ public class Conversation {
     public Conversation(String classPathFromBean)
     {
         System.out.println("~~~~~~~~~~以下是Conversation~~~~~~~~~~");
-        // water.ustc.bean.UserBean
+        // water.ustc.bean.UserBean,完整类名,用于反射
         this.classNamePath = classPathFromBean;
         // 路径中截取类名
         String nameFromPath = classPathFromBean.substring(classPathFromBean.lastIndexOf(".")+1);
@@ -79,13 +79,14 @@ public class Conversation {
             }
 
             QueryResult queryResult = new QueryResult(lazyFlag);
+
             if (lazyFlag)
             {
                 // 需要延迟加载
                 System.out.println(beanPropertyName+"需要延迟加载");
                 // return sql;
                 queryResult.setBeanPath(this.classNamePath);
-                queryResult.setLazySQL(sql,this.driver_class,this.url_path,this.db_username,this.db_userpassword);
+                queryResult.setLazySQL(sql);
                 // return queryResult;
             }else
             {
@@ -108,11 +109,11 @@ public class Conversation {
                             // 从配置文件中遍历property的对应的column
                             System.out.println("*****");
                             String propertyColumnName = property.get("column");
-                            System.out.println("    查询xml中的property名称(key):"+propertyColumnName);
+                            System.out.println("    查询xml中的property名称(列名):"+propertyColumnName);
                             // 拿出对应的值
                             String resultSetString = resultSet.getString(propertyColumnName);
                             System.out.println("    其对应值(来自数据库)为:"+resultSetString);
-                            queryResultMap.put(propertyColumnName,resultSetString);
+                            queryResultMap.put(property.get("name"),resultSetString);
                             System.out.println("*****");
                         }
                         resultHashMapList.add(queryResultMap);
@@ -135,15 +136,13 @@ public class Conversation {
 
     public boolean insert(Object beanObject)
     {
-
+        // 数据库是否插入成功
         boolean insertResult = false;
 
 
         try {
-
+            // 反射找到Bean对象
             Class beanClass = Class.forName(classNamePath);
-
-
 
             ArrayList<String> valueList = new ArrayList<>();
             valueList.add("'0'"); // 第一个为ID,写死为0
@@ -154,6 +153,7 @@ public class Conversation {
             {
                 System.out.println("*******");
                 String propertyName = property.get("name");
+                // 拼接出getter方法的完整方法名
                 String propertyGetter = "get" + captureName(propertyName);
                 System.out.println(property+"的getter为"+propertyGetter);
                 // 反射出getter方法,并执行方法,得到属性值
@@ -381,11 +381,11 @@ public class Conversation {
                     // 从配置文件中遍历property的name
                     System.out.println("*****");
                     String propertyColumnName = property.get("column");
-                    System.out.println("    查询xml中的property名称(key):"+propertyColumnName);
+                    System.out.println("    查询xml中的property名称(列名):"+propertyColumnName);
                     // 拿出对应的值
                     String resultSetString = resultSet.getString(propertyColumnName);
                     System.out.println("    其对应值(来自数据库)为:"+resultSetString);
-                    queryResultMap.put(propertyColumnName,resultSetString);
+                    queryResultMap.put(property.get("name"),resultSetString);
                     System.out.println("*****");
                 }
                 resultHashMapList.add(queryResultMap);
