@@ -4,10 +4,16 @@ import water.ustc.bean.UserBean;
 
 public class RegisterAction {
 
-    public String handleRegister(String userName, String pwd) {
+    // private UserBean user;
 
-        UserBean userBean = new UserBean(userName, pwd);
-        if (userBean.signUp())
+
+    public String handleRegister(String name,String pwd) {
+
+        UserBean user = new UserBean();
+        user.setUserName(name);
+        user.setUserPass(pwd);
+
+        if (user.signUp())
         {
             return "success";
         }else
@@ -15,4 +21,12 @@ public class RegisterAction {
             return "handleRegister()出错";
         }
     }
+
+//    public UserBean getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserBean user) {
+//        this.user = user;
+//    }
 }

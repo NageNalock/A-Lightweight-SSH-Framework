@@ -12,10 +12,22 @@ import water.ustc.bean.UserBean;
  * \
  */
 public class LoginAction {
-    public String handleLogin(String name,String pwd) {
 
-        UserBean userBean = new UserBean(name, pwd);
-        if(userBean.signIn())
+
+    private UserBean user;
+
+    public UserBean getUser() {
+        return user;
+    }
+
+    public void setUser(UserBean user) {
+        this.user = user;
+    }
+
+    public String handleLogin()
+    {
+        // UserBean userBean = new UserBean(name, pwd);
+        if(user.signIn())
         {
             return "success";
         }else {

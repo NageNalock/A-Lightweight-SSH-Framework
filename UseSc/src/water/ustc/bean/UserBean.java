@@ -11,11 +11,6 @@ public class UserBean  {
     private String userName;
     private String userPass;
 
-    public UserBean(String userName,String userPass)
-    {
-        this.userName = userName;
-        this.userPass = userPass;
-    }
 
     public boolean signIn()
     {
@@ -53,5 +48,13 @@ public class UserBean  {
 
     public String getUserPass() {
         return userPass;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setUserPass(String userPass) {
+        this.userPass = userPass;
     }
 }

@@ -4,13 +4,20 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import sc.ustc.di.BeanField;
+import water.ustc.bean.UserBean;
 import water.ustc.interceptor.InterceptorAttribute;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,7 +49,7 @@ public class SimpleController extends HttpServlet {
         doPost(request,response);
     }
 
-    private  void doAction(HttpServletRequest request, HttpServletResponse response,String trueReqActionName,String username,String pwd)
+    private  void doAction(HttpServletRequest request, HttpServletResponse response,String trueReqActionName,String userName,String userPass)
     {
         try {
             InputStream inputStream = this.getClass().getResourceAsStream("/controller.xml");
@@ -63,6 +70,7 @@ public class SimpleController extends HttpServlet {
 
             List<Element> interceptorList = rootElement.elements("interceptor");
             // System.out.println("**********************");
+            // 此处应该用反射的
             List<InterceptorAttribute> interceptorAttributeList = new ArrayList<InterceptorAttribute>(); // 存放过滤器信息
             System.out.println("    (1)层某单一节点名称为:interceptor");
             System.out.println("    其总数为"+interceptorAttributeList.size());
@@ -106,14 +114,30 @@ public class SimpleController extends HttpServlet {
                     System.out.println(xmlActionName+"的Class为"+xmlActionClass);
                     String xmlActionMethod = action.attributeValue("method");
                     System.out.println(xmlActionName+"的Method为"+xmlActionMethod);
-                    // 反射
-                    Class actionClass = Class.forName(xmlActionClass); // 构建类
-                    Object actionObeject = actionClass.newInstance(); // 实现类(无参)
-                    Method actionMethod = actionClass.getDeclaredMethod(xmlActionMethod, String.class, String.class); // 获取方法
 
-                    // 反射后,获取执行对应类的对应方法的结果
-                    String returnResult = (String) actionMethod.invoke(actionObeject, username, pwd);
-                    System.out.println("反射后,获取执行对应类的对应方法的结果为"+returnResult);
+                    String returnResult;
+                    // 此处进行依赖注入逻辑
+                    HashMap<String, ArrayList<BeanField>> diInfo = readDI();
+                    if (diInfo.get(trueReqActionName)==null)
+                    {
+                        // 未在di.xml中找到action信息
+                        System.out.println("~~~~~~~~~~依赖注入~~~~~~~~~~~~~~~");
+                        System.out.println(trueReqActionName+"在依赖注入配置文件中未查询到相关bean");
+                        System.out.println("*******开始执行正常的反射逻辑*******");
+                        // 反射
+                        Class actionClass = Class.forName(xmlActionClass); // 构建类
+                        Object actionObeject = actionClass.newInstance(); // 实现类(无参)
+                        Method actionMethod = actionClass.getDeclaredMethod(xmlActionMethod, String.class, String.class); // 获取handle方法
+
+                        // 反射后,获取执行对应类的对应方法的结果
+                        returnResult = (String) actionMethod.invoke(actionObeject, userName, userPass);
+                        // returnResult = temp;
+                        System.out.println("反射后,获取执行对应类的对应方法的结果为"+returnResult);
+                    }else
+                    {
+                        // di.xml中有action信息
+                        returnResult = doDI(trueReqActionName,xmlActionClass,diInfo,userName,userPass,xmlActionMethod);
+                    }
 
 
                     // 虽然已经返回了Action结果,但是还不执行,这里开始执行拦截器进入pre方法
@@ -250,10 +274,10 @@ public class SimpleController extends HttpServlet {
 
                         // 生成html文件
                         resultValue = doResultView(resultValue)+".html";
-
                         System.out.println("视图HTML:"+resultValue);
                     }else System.out.println("          result调用文件是普通文件");
                     System.out.println("其value为:"+resultValue);
+                    // 应该写成switch的
                     if (resultType.equals("forward"))
                     {
                         // 转发
@@ -382,7 +406,6 @@ public class SimpleController extends HttpServlet {
                                     break;
                                 }
                             }
-
                         }
                         sb.append("</form>\n");
                         break;
@@ -398,5 +421,126 @@ public class SimpleController extends HttpServlet {
             e.printStackTrace();
         }
         return newResultValue;
+    }
+
+    private HashMap<String,ArrayList<BeanField>> readDI()
+    {
+        HashMap<String, ArrayList<BeanField>> returnHashMap = new HashMap<>();
+
+        try {
+            InputStream inputStream = this.getClass().getResourceAsStream("/di.xml");
+            SAXReader saxReader = new SAXReader();
+            Document document = saxReader.read(inputStream);
+
+            // 获取根节点
+            Element rootElement = document.getRootElement();
+            // System.out.println(rootElement.getName());
+
+            // 获取bean节点
+            List<Element> beansElementList = rootElement.elements("bean");
+            for(Element beanElement:beansElementList)
+            {
+                String beanId = beanElement.attributeValue("id");
+                String beanClass = beanElement.attributeValue("class");
+                // 存储field节点信息,因为可能有多个field,所以用List存储
+                ArrayList<BeanField> beanFieldsList = new ArrayList<>();
+                List<Element> fieldElementList = beanElement.elements("field");
+                for (Element fieldElement:fieldElementList)
+                {
+                    String fieldName = fieldElement.attributeValue("name");
+                    String fieldBean_ref = fieldElement.attributeValue("bean-ref");
+                    BeanField beanField = new BeanField(fieldName, fieldBean_ref,beanClass);
+                    // System.out.println(fieldName+";"+fieldBean_ref);
+                    beanFieldsList.add(beanField);
+                }
+                returnHashMap.put(beanId,beanFieldsList);
+            }
+            // inputStream = null;
+        } catch (DocumentException e) {
+            System.out.println("di.xml读取失败"+e);
+        }
+
+        return returnHashMap;
+    }
+
+    private String doDI(String trueReqActionName,String xmlActionClass,HashMap<String, ArrayList<BeanField>> diInfo,String userName,String userPass,String xmlActionMethod)
+    {
+        try {
+            System.out.println("~~~~~~~~~~依赖注入~~~~~~~~~~~~~~~");
+            System.out.println(trueReqActionName+"在依赖注入配置文件中查询到了相关bean");
+            System.out.println("#######开始进行依赖注入###########");
+
+            // 反射构建Action类
+            Class actionClass = Class.forName(xmlActionClass); // 构建类
+            Object actionObeject = actionClass.newInstance(); // 实现类(无参)
+
+
+            // 构建以<bean对象名,bean对象>的HashMap
+            HashMap<String, Object> beanHashMap = new HashMap<>();
+
+            // 查找Action下的field
+            ArrayList<BeanField> beanFieldsList = diInfo.get(trueReqActionName);
+            for (BeanField beanField:beanFieldsList)
+            {
+                String beanName = beanField.getName();
+                String beanBean_ref = beanField.getBean_ref();
+
+                // 拼接bean的完整名
+                beanName = "water.ustc.bean."+beanName;
+
+                // Bean的内省,传入username和pwd
+                Class beanClass = Class.forName(beanName);
+                Object beanObject = beanClass.newInstance();
+                // 后面参数表示停止继承参数,表示不显示从父类继承下来的属性
+                // 每个类都会从Object类继承下class属性,所以这里排除
+                BeanInfo beanInfo = Introspector.getBeanInfo(beanClass, Object.class);
+
+                // 对Bean的内省开始
+                PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+                for (PropertyDescriptor property:properties)
+                {
+                    System.out.println("IIIIIIIIIIIIIII");
+                    Method writeMethod = property.getWriteMethod();
+                    // 因为现在从页表上得到参数只有userName与userPass,所以先写成这样
+                    switch (property.getName())
+                    {
+                        case "userName":
+                        {
+                            writeMethod.invoke(beanObject,userName);
+                            break;
+                        }
+                        case "userPass":
+                        {
+                            writeMethod.invoke(beanObject,userPass);
+                            break;
+                        }
+                    }
+                    System.out.println(property.getName()+"的getter为"+writeMethod.getName());
+                    System.out.println("IIIIIIIIIIIIIIIII");
+                }
+
+                // 将构建好的bean对象存入HashMap中
+                beanHashMap.put(beanBean_ref,beanObject);
+            }
+            // 遍历HashMap,依赖内省将bean注入Action
+            BeanInfo actionInfo = Introspector.getBeanInfo(actionClass, Object.class);
+            PropertyDescriptor[] actionProperties = actionInfo.getPropertyDescriptors();
+            for (PropertyDescriptor actionProperty:actionProperties)
+            {
+                // 获取Action中作为属性的bean对象
+                Object beanObject = beanHashMap.get(actionProperty.getName());
+                // 获取setter
+                Method writeMethod = actionProperty.getWriteMethod();
+                // 将bean注入Action
+                writeMethod.invoke(actionObeject,beanObject);
+                System.out.println("依赖注入中注入Action的属性为"+actionProperty.getName());
+            }
+            // 执行Action
+            Method actionMethod = actionClass.getDeclaredMethod(xmlActionMethod); // 获取handle方法
+            return (String)actionMethod.invoke(actionObeject);
+        } catch (Exception e) {
+            System.out.println("依赖注入失败:"+e);
+            return null;
+        }
     }
 }
