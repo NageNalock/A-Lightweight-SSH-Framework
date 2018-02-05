@@ -7,6 +7,7 @@
 E1 http://staff.ustc.edu.cn/~waterzhj/files/ssh/e1.pdf
 
 E2 http://staff.ustc.edu.cn/~waterzhj/files/ssh/e2.pdf
+思路整理 http://dicey.cc/2018/01/29/2018-1-29-05/
 
 E3 http://staff.ustc.edu.cn/~waterzhj/files/ssh/e3.pdf
 
